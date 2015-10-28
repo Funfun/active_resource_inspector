@@ -1,0 +1,1 @@
+class NotActiveResourceClass;end
