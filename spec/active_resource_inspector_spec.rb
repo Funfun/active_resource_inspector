@@ -17,16 +17,7 @@ describe ActiveResourceInspector do
   end
 
   describe '#resources' do
-    let(:all){ Dir[File.join(inspector.dirname, '**/*.rb')] }
-    let(:not_active_resource){ "./spec/fixtures/not_active_resource_class.rb" }
-    let(:a_module){ "./spec/fixtures/concerns/some_module.rb" }
-    let(:abstract_active_resource){ "./spec/fixtures/abstract_active_resource_class.rb" }
-
     before do
-      expect(File.exists?(not_active_resource)).to be_truthy
-      expect(File.exists?(a_module)).to be_truthy
-      expect(File.exists?(abstract_active_resource)).to be_truthy
-
       inspector.dirname = './spec/fixtures/'
     end
     it 'handles subfolders & ingores modeuls' do
@@ -34,7 +25,7 @@ describe ActiveResourceInspector do
     end
 
     it 'returns ActiveResource based classes && skips non-ActiveResource, modeules, ActiveResource abstract classes based on missing site option' do
-      expect(inspector.resources).to eq(all - [abstract_active_resource, not_active_resource, a_module])
+      expect(inspector.resources).to eq([AddressResource, Admin::ProxyResource, Inventory])
     end
   end
 end

@@ -8,12 +8,16 @@ module ActiveResourceInspector
     attr_accessor :dirname
 
     def resources
-      @resources ||= files.select do |file|
+      @resources ||= files.map do |file|
         filename = file.split(dirname).last.gsub('.rb', '')
         klass = filename.camelize.constantize
         next if klass.class == Module
-        ActiveResource::Base == klass.superclass && klass.site.present?
-      end
+        if ActiveResource::Base == klass.superclass && klass.site.present?
+          klass
+        else
+          next
+        end
+      end.compact
     end
 
     def files
@@ -30,21 +34,8 @@ module ActiveResourceInspector
       end
     end
 
-    private
-
-    def self.factory
-      Base.new.tap do |obj|
-        if defined?(Rails::Railtie)
-          obj.dirname = File.join(Rails.root,'app', 'models')
-        else
-          obj.dirname = dirpath || '.'
-        end
-      end
-    end
-
     def defaul_print(&block)
-      puts "\nActiveResource Inspector v #{ActiveResourceInspector::VERSION}"
-      puts "\nLocation: #{dirname}"
+      puts "Location: #{dirname}"
       puts "\n"
       resources.group_by{|e| e.site.to_s }.each do |endpoint, rs|
         rs.group_by{|e| e.auth_type }.each do |auth_type, rs2|
@@ -61,6 +52,18 @@ module ActiveResourceInspector
             end
           end
           puts t.sort
+        end
+      end
+    end
+
+    private
+
+    def self.factory(dirname)
+      Base.new.tap do |obj|
+        if defined?(Rails::Railtie)
+          obj.dirname = File.join(Rails.root,'app', 'models')
+        else
+          obj.dirname = dirname || '.'
         end
       end
     end
