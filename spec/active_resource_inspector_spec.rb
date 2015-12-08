@@ -20,7 +20,7 @@ describe ActiveResourceInspector do
     before do
       inspector.dirname = './spec/fixtures/'
     end
-    it 'handles subfolders & ingores modeuls' do
+    it 'handles subfolders & ingores modules' do
       expect{ inspector.resources }.to_not raise_error
     end
 
